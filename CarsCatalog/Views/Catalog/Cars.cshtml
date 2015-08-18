@@ -1,0 +1,35 @@
+﻿@model IEnumerable<CarsCatalog.Models.Car>
+
+<div id="page@(ViewBag.CurrentPageNumber)" class="page-content">
+
+    @foreach (var car in Model)
+    {
+        <div class="car-wrapper" style='width: @(100/@ViewBag.Columns-2)%;'>
+            <div id="car@(car.Id)" class="car">
+                <div class="full-info">
+                    <div class="car-img-wrap">
+                        <div class="car-img-content">
+                            <a href="@Url.Action("Details", "Cars", new {id = car.Id})">
+                                <div class="img-link-wrap">
+                                    <img src="@( (car.ImageData != null) ?
+                                                     Url.Action("GetImage", "Cars", new {car.Id}):
+                                                     Url.Content("Content/empty.jpg"))" c class="car-img" />
+
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="car-details-link text-center">
+                        @Html.ActionLink(car.Model.Brand.Name + " " + car.Model.Name, "Details", "Cars", new { id = car.Id }, null)
+                    </div>
+                    <div class="car-param">
+                        @(car.Color) color <br />
+                    </div>
+                    <div class="car-param">Engine: @(car.EngineCapacity)L </div>
+                    <div class="car-param text-price "> @(car.Price.ToString("c0"))</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="page-count">@ViewBag.pageCount</div>

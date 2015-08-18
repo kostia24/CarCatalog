@@ -1,0 +1,79 @@
+﻿@model IEnumerable<CarsCatalog.Models.BrandModelsTree>
+
+@Styles.Render("/Content/jquery.treeview.css")
+@Styles.Render("/Content/smoothness/jquery-ui-1.10.4.custom.css")
+@Scripts.Render("~/Scripts/jquery.treeview.js")
+@Scripts.Render("~/Scripts/jquery-ui-1.10.4.custom.js")
+
+
+<div class="filter-parametrs">
+    <div class="filter-parametr">
+        <div id="show-all" class="btn btn-warning ">Show all cars</div>
+    </div>
+    @if (Model != null)
+    {
+        <div class="filter-parametr">
+            <h4 class="filter-parametr-title">Brands</h4>
+            <div class="filter-parameter-content">
+
+                <ul id="brandmodel">
+                    @TreeView(Model)
+                </ul>
+            </div>
+        </div>
+    }
+    <script type="text/javascript">
+        $("#brandmodel").treeview({
+            persist: "location",
+            collapsed: true,
+            unique: true,
+            animated: 280
+        });
+    </script>
+    <div class="filter-parametr">
+        <h4 class="filter-parametr-title">Color</h4>
+        <div class="filter-parametr-content">
+            <input id="color-autocomplete" class="filter-input" type="text" value="" />
+        </div>
+    </div>
+    <div class="filter-parametr">
+        <h4 class="filter-parametr-title">Engine capacity</h4>
+        <div class="filter-parametr-content">
+            <input id="engine-capacity-autocomplete" class="filter-input" type="number" value="" />
+        </div>
+    </div>
+    <div class="filter-parametr">
+        <h4 class="filter-parametr-title">Price</h4>
+        <div class="filter-parametr-content">
+            <div>
+                Date: <br /> <input type="text" id="datepicker" class="filter-input">
+            </div>
+            <div>
+                $<input type="text" id="min-price" pattern="\d*" maxlength="7" size="6" class="input-small" />
+                to $<input type="text" id="max-price" pattern="\d*" maxlength="7" size="6" class="input-small" />
+                <span class="price-btn">
+                    <button type="submit" name="date-with-price-range" id="date-with-price-range" class="btn btn-default btn-xs">ok </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@helper TreeView(IEnumerable<CarsCatalog.Models.BrandModelsTree> brands)
+{
+    foreach (var brand in brands)
+    {
+        <li>
+            <div id="@brand.Id" class="btn btn-primary btn-sm @brand.Type">@brand.Name</div>
+            <ul>
+                @foreach (var carModel in brand.List)
+                {
+                    <li id="@carModel.Id" class="@carModel.Type">
+                        <div class="btn btn-info btn-sm">@carModel.Name</div>
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+
+}

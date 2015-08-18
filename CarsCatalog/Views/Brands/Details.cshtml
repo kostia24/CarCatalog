@@ -1,0 +1,29 @@
+﻿@model CarsCatalog.Models.CarBrand
+
+@{
+    ViewBag.Title = "Car brand details";
+}
+<div>
+    <h3>Car brand details</h3>
+    <hr />
+
+    <dl class="dl-horizontal">
+
+        <dt>
+            Brand name:
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @if (Request.IsAuthenticated && User.IsInRole("admin"))
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+        @:|
+        }
+    @Html.ActionLink("Back to List", "Index")
+</p>

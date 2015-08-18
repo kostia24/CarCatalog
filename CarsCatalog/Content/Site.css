@@ -1,0 +1,286 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 200px;
+}
+
+.brand {
+    width: 90%;
+}
+
+.model > div {
+    width: 80%;
+}
+
+.car-wrapper {
+    float: left;
+}
+
+.car {
+    padding: 5px;
+    margin-left: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #eaeaea;
+    vertical-align: middle;
+    horiz-align: center;
+    -webkit-box-shadow: 0 0 1px #eaeaea;
+    -ms-box-shadow: 0 0 1px #eaeaea;
+    box-shadow: 0 0 1px #eaeaea;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    -o-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-transition-duration: 0.1s;
+    -moz-transition-duration: 0.1s;
+    -ms-transition-duration: 0.1s;
+    -o-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    -webkit-transition-property: box-shadow;
+    -moz-transition-property: box-shadow;
+    -ms-transition-property: box-shadow;
+    -o-transition-property: box-shadow;
+    transition-property: box-shadow;
+}
+
+    .car:hover, .car:focus, .car.active {
+        border: 1px solid #dcdcdc;
+        -webkit-box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.6);
+        -ms-box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.6);
+        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+    }
+
+.full-info {
+    border: 1px solid transparent;
+    left: -11px;
+    overflow: hidden;
+    transition: box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1) 0, min-height 0.75s cubic-bezier(0.25, 0.1, 0.25, 1) 0;
+}
+
+.car-img-wrap {
+    border: 1px solid rgb(210, 210, 210);
+    vertical-align: middle;
+    display: table;
+    width: 100%;
+}
+.car-img-wrap:hover, .car-img-wrap:focus, .car-img-wrap.active {
+    border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.car-img {
+    width: 95%;
+    height: 95%;
+    border: 1px solid rgba(210, 210, 210, 0.08);
+}
+
+.car-img:hover, .car-img:focus, .car-img.active {
+    border: 1px solid rgb(210, 210, 210);
+}
+
+.car-img-content {
+    width: 100%;
+    vertical-align: middle;
+    text-align: center;
+    display: table-cell;
+}
+
+.img-link-wrap {
+    width: 100%;
+}
+
+.car-details-link {
+    font-size: 16px;
+    font-weight: 200;
+    margin-top: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 95%;
+}
+
+.car-param {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 16px;
+}
+
+.text-price {
+    color: #b12704;
+    font-size: 17px;
+}
+
+.main-container {
+    display: table;
+}
+
+#left-sidebar {
+    display: table-cell;
+    min-width: 185px;
+    border-right-color: rgb(216, 215, 215);
+    padding-right: 2px;
+    float: left;
+    width: 20%;
+    position: relative;
+    border-right: 1px solid #eaeaea;
+    display: block;
+}
+
+#main-content {
+    display: table-cell;
+    padding-left: 5px;
+    min-width: 590px;
+}
+
+.page-title {
+    text-align: center;
+    margin-right: 20%;
+}
+
+.title-page-with-filters-wrap {
+    border-bottom-color: rgb(218, 216, 216);
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 4px;
+    padding-bottom: 0.85em;
+}
+
+.filter-parametrs {
+    position: relative;
+}
+
+.filter-parametr {
+    margin-bottom: -5px;
+    position: relative;
+    padding-bottom: 1.25em;
+    position: relative;
+    border-right: 1px solid #D6D4D4;
+    border-bottom: 1px solid #CAC7C7;
+}
+
+.filter-parametr-title {
+    font-family: Arial, Helvetica, FreeSans, "Liberation Sans", "Nimbus Sans L", sans-serif;
+    color: #3e77aa;
+    font-size: 1.2em;
+    font-weight: 400;
+    margin-left: 0.7em;
+    padding: 0.2231em 2.0923em 0.69231em 0;
+    display: block;
+    margin-bottom: 0.5em;
+}
+
+.filter-parameter-content {
+    font-size: 0.8125em;
+}
+
+.filter-input {
+    max-width: 160px;
+}
+
+#show-all {
+    width: 90%;
+}
+
+.input-small {
+    width: 4em;
+    height: 1.5em;
+    line-height: normal;
+    font-size: 0.86em;
+}
+
+#date-with-price-range {
+    line-height: normal;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: rgb(81, 93, 154);
+    margin-top: 8px;
+    height: 24px;
+    padding: 2px 4px 3px;
+    font-size: 0.92308em;
+}
+
+.price-btn {
+    -webkit-box-shadow: 3px 3px 7px 0 rgba(200, 200, 200, .5), inset 0 -3px 0 0 #c1c1c1;
+    -ms-box-shadow: 3px 3px 7px 0 rgba(200, 200, 200, .5), inset 0 -3px 0 0 #c1c1c1;
+    box-shadow: 3px 3px 7px 0 rgba(200, 200, 200, .5), inset 0 -3px 0 0 #c1c1c1;
+}
+
+.catalog-elements-on-page {
+    right: 0;
+    bottom: 0;
+    height: 2em;
+    float: left;
+}
+
+.catalog-col-count {
+    margin-right: 0.8em;
+    right: 0;
+    bottom: 0;
+    height: 3.92308em;
+    float: left;
+}
+
+.catalog-view-filters {
+    right: 4.8em;
+    bottom: 0.5em;
+    height: 1em;
+    position: absolute;
+}
+
+.pos-fix {
+    position: relative;
+}
+
+#paging-navigation {
+    width: 80%;
+    float: right;
+    margin: 20px;
+    font-size: 16px;
+    text-align: center;
+    height: 36px;
+    line-height: 36px;
+}
+
+.page-count {
+    display: none;
+}
+
+.chartdiv {
+    width: 80%;
+    height: 300px;
+}
+
+@media (min-width: 992px) {
+    .dl-car dt {
+        float: left;
+        width: 120px;
+        clear: left;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dl-car dd {
+        margin-left: 130px;
+    }
+}

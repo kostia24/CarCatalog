@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Main page";
+}
+<h2 class="page-title">Car catalog</h2>
+<div class="container main-container">
+    <div id="left-sidebar" class="container">
+        @Html.Action("GetBrandsModelsTree")
+    </div>
+    <div id="main-content" class="container">
+        <div class="title-page-with-filters-wrap">
+            <div class="pos-fix">
+                <div class="catalog-view-filters">
+
+                    <div class="catalog-col-count">
+                        <span>Columns</span>
+                        @Html.DropDownList("ColumnsList")
+                    </div>
+                    <div class="catalog-elements-on-page">
+                        <span> Elements on page</span>
+                        @Html.DropDownList("ElementsPerPageList")
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="" id="mainCarList">
+            @Html.Action("GetCars")
+        </div>
+
+        <div id="paging-navigation" class="btn-group"></div>
+
+    </div>
+</div>
+@section initScripts
+{
+    @Styles.Render("~/Content/smoothness/jquery-ui-1.10.4.custom.css")
+    @Scripts.Render("~/Scripts/jquery-ui-1.10.4.custom.js")
+}
+@section scripts
+{
+    @Scripts.Render("~/Scripts/catalog.js")
+}

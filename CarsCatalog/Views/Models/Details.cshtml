@@ -1,0 +1,36 @@
+﻿@model CarsCatalog.Models.CarModel
+
+@{
+    ViewBag.Title = "Car model details";
+}
+
+
+<div>
+    <h3>Car model details</h3>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Brand.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Brand.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @if (Request.IsAuthenticated && User.IsInRole("admin"))
+    {
+        @Html.ActionLink("Edit", "Edit", new {id = Model.Id}) @:|
+    }
+    @Html.ActionLink("Back to List", "Index", new {id = Model.BrandId})
+</p>

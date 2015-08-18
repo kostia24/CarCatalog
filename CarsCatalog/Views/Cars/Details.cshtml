@@ -1,0 +1,85 @@
+﻿@model CarsCatalog.Models.Car
+
+@{
+    ViewBag.Title = "Car details";
+}
+
+
+<div>
+    <h3>Car details</h3>
+    <hr />
+    @if (Model.ImageData != null)
+    {
+        <img src="@Url.Action("GetImage", "Cars", new {Model.Id})" />
+
+    }
+    <dl class="dl-horizontal">
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Model.Brand.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Model.Brand.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Color)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Color)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            $@Html.DisplayFor(model => model.Price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EngineCapacity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EngineCapacity) l
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+    </dl>
+    <h4>Dynamics changing price on car</h4>
+    <div id="chartdiv">
+    </div>
+    <script type="text/javascript">
+        var chartData = @Html.Raw(Json.Encode(ViewBag.PriceHistory));
+    </script>
+</div>
+@if (Request.IsAuthenticated && User.IsInRole("admin"))
+{
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index", new { id = Model.ModelId })
+    </p>
+}
+@section scripts
+{
+    @Scripts.Render("~/bundles/chart")
+}

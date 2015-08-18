@@ -1,0 +1,103 @@
+﻿@model IEnumerable<CarsCatalog.Models.Car>
+
+@{
+    ViewBag.Title = ViewBag.model.Name;
+    var opStatus = TempData["OperationStatus"] as CarsCatalog.Models.OperationStatus;
+}
+<h3>
+    @ViewBag.model.Brand.Name
+    @ViewBag.model.Name
+</h3>
+@if (Request.IsAuthenticated && User.IsInRole("admin"))
+{
+    <p>
+        @Html.ActionLink("Create New", "Create", new { modelId = ViewBag.model.Id })
+    </p>
+}
+@if (opStatus != null && opStatus.Status == false)
+{
+    <h4 class="text-danger">status.Message </h4>
+}
+@if (!Model.Any())
+{
+    <h3>No cars in this model </h3>
+}
+else
+{
+    <div class="container">
+        @foreach (var car in Model)
+        {
+            <div class="car-wrapper" style='width: 24%;'>
+                <div id="car@(car.Id)" class="car">
+                    <div class="full-info">
+                        <div class="car-img-wrap">
+                            <div class="car-img-content">
+                                <a href="@Url.Action("Details", "Cars", new {id = car.Id})">
+                                    <div class="img-link-wrap">
+                                        <img src="@( (car.ImageData != null) ?
+                                                     Url.Action("GetImage", "Cars", new {car.Id}):
+                                                     Url.Content("/Content/empty.jpg"))" c class="car-img" />
+
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="car-details-link text-center">
+                            @Html.ActionLink(car.Model.Brand.Name + " " + car.Model.Name, "Details", "Cars", new { id = car.Id }, null)
+                        </div>
+                        <br />
+                        <dl class="dl-car">
+                            <dt>
+                                @Html.DisplayNameFor(model => model.Color)
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(modelItem => car.Color)
+                            </dd>
+                            <dt>
+                                @Html.DisplayNameFor(model => model.Price)
+                            </dt>
+                            <dd>
+                                $@Html.DisplayFor(modelItem => car.Price)
+                            </dd>
+                            <dt>
+                                Engine
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(modelItem => car.EngineCapacity)L
+                            </dd>
+                        </dl>
+                        <div class="text-center">
+                            @Html.ActionLink("Details", "Details", new { id = car.Id })
+                            @if (Request.IsAuthenticated && User.IsInRole("admin"))
+                            {
+                                @:|
+                                @Html.ActionLink("Edit", "Edit", new { id = car.Id })
+                                @:|
+                                @Html.ActionLink("Delete", "Delete", new { id = car.Id })
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+<br />
+<br />
+
+<p style="width: 100%">
+    @Html.ActionLink("Back to models", "Index", "Models", new { id = ViewBag.model.BrandId }, null)
+</p>
+@section scripts
+{
+    <script type="text/javascript">
+        var carImgWidth = $(".car-img-wrap").width();
+        $(".car-img-wrap").height(carImgWidth * 0.8);
+
+        $(window).resize(function () {
+            var carImgWidth = $(".car-img-wrap").width();
+            $(".car-img-wrap").height(carImgWidth * 0.8);
+        });
+    </script>
+}
