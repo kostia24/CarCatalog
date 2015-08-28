@@ -12,10 +12,11 @@
         @Html.ActionLink("Create New", "Create")
     </p>
 }
-@if (opStatus != null && !opStatus.Status)
+@if (opStatus != null)
 {
-    <h4 class="text-danger">@opStatus.Message </h4>
+    <h4 class="@(opStatus.Status ? "text-success" : "text-danger") ">@opStatus.Message </h4>
 }
+
 @if (!Model.Any())
 {
     <h3>No brands yet. Please create new! </h3>
@@ -35,14 +36,17 @@ else
             <tr>
                 <td>
                     @Html.ActionLink(item.Name, "Index", "Models", new { Id = item.Id }, null)
+                    (@item.Models.Count)
                 </td>
                 <td>
                     @Html.ActionLink("Details", "Details", new { id = item.Id })
                     @if (Request.IsAuthenticated && User.IsInRole("admin"))
                     {
                         @:|
-                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) @:|
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                        @Html.ActionLink("Edit", "Edit", new {id = item.Id})
+                        @:|
+                            @Html.ActionLink("Delete", "Delete", new { id = item.Id },
+                        item.Models.Any() ? new {@class = "warning"} :  null )                                         
                     }
                 </td>
             </tr>

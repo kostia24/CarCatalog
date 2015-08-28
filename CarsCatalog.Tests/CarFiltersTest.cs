@@ -29,7 +29,7 @@ namespace CarsCatalog.Tests
                 new Car() {Price = 12400, EngineCapacity = "1.6", Color = "Blue", ModelId = 2},
                 new Car() {Price = 7500, EngineCapacity = "2.5", Color = "Blue", ModelId = 13},
                 new Car() {Price = 4500, EngineCapacity = "2.5", Color = "Blue", ModelId = 7}
-            };
+            }.AsQueryable();
             var target = GetTarget();
             // act
             var resultcars = target.GetCarsByEngineCapacity(cars, "1.");
@@ -50,7 +50,7 @@ namespace CarsCatalog.Tests
                 new Car() {Price = 12400, EngineCapacity = "1.6", Color = "Blue", ModelId = 2},
                 new Car() {Price = 7500, EngineCapacity = "2.5", Color = "Blue", ModelId = 13},
                 new Car() {Price = 4500, EngineCapacity = "2.5", Color = "Blue", ModelId = 7}
-            };
+            }.AsQueryable();
             var target = GetTarget();
             // act
             var resultcars = target.GetCarsByEngineCapacity(cars, "4");
@@ -116,7 +116,7 @@ namespace CarsCatalog.Tests
                         new PriceChangeHistory(){Price = 55000, CarId = 2 , DateChange = new DateTime(2015, 8, 5)}
                     }
                 },
-            };
+            }.AsQueryable();
             var target = GetTarget();
             // act
             var resultcarsAll = target.GetCarsFromPriceRangeWithSpecificDate(cars, 0, 57000, new DateTime(2015, 8, 8));

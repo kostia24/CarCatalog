@@ -12,9 +12,9 @@
         @Html.ActionLink("Create New", "Create", new {brandId = ViewBag.brand.Id})
     </p>
 }
-@if (opStatus != null && opStatus.Status == false)
+@if (opStatus != null)
 {
-    <h4 class="text-danger">status.Message </h4>
+    <h4 class="@(opStatus.Status ? "text-success" : "text-danger") ">@opStatus.Message </h4>
 }
 @if (!Model.Any())
 {
@@ -34,7 +34,8 @@ else
         {
             <tr>
                 <td>
-                    @Html.ActionLink(item.Name, "index", "Cars", new { Id = item.Id }, null)
+                    @item.Name
+                    (@item.Cars.Count)
                 </td>
                 <td>
                     @Html.ActionLink("Details", "Details", new { id = item.Id })
@@ -42,7 +43,8 @@ else
                     {
                         @:| @Html.ActionLink("Edit", "Edit", new { id = item.Id })
                         @:|
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id },
+                        item.Cars.Any() ? new {@class = "warning"} :  null )
                     }
                 </td>
             </tr>

@@ -52,7 +52,6 @@
     <Compile Include="CarRepository.cs" />
     <Compile Include="CatalogContext.cs" />
     <Compile Include="ChangePriceRepository.cs" />
-    <Compile Include="IBrandCarTreeRepository.cs" />
     <Compile Include="IBrandRepository.cs" />
     <Compile Include="ICarFilterRepository.cs" />
     <Compile Include="ICarRepository.cs" />

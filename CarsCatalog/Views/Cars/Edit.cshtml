@@ -14,13 +14,51 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
 
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Model.BrandId, "Brand", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="BrandId" name="BrandId">
+                    @foreach (var brand in ViewBag.BrandTree)
+                    {
+                        <option value="@brand.Id" @(brand.Id == @ViewBag.CarModel.BrandId ? "selected" : "")>@brand.Name</option>
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => model.Model.BrandId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
         <div class="form-group">
             @Html.LabelFor(model => model.ModelId, "Model", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("ModelId", null, htmlAttributes: new { @class = "form-control" })
+                <select class="form-control" id="ModelId" name="ModelId"></select>
                 @Html.ValidationMessageFor(model => model.ModelId, "", new { @class = "text-danger" })
             </div>
         </div>
+        
+        <script type="text/javascript">
+            var brand_model_Tree = @Html.Raw(Json.Encode(ViewBag.BrandTree));
+            var modelDownList = function() {
+                var selectedContent = "";
+                var brandId = $("#BrandId").val();
+
+                var models = brand_model_Tree[brandId-1].List;
+
+                for (var i = 0; i < models.length; i++) {
+                    if(models[i].Id == @(ViewBag.CarModel.Id) )
+                        selectedContent += "<option value='"+models[i].Id+"' selected >" + models[i].Name + "</option>";
+                    else
+                        selectedContent += "<option value='"+models[i].Id+"' >" + models[i].Name + "</option>";
+                }
+                $("#ModelId")[0].innerHTML = selectedContent;
+            }
+            modelDownList();
+
+            $("#BrandId").change(function () {
+                modelDownList();
+            });
+        </script>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Color, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -83,7 +121,7 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index", new { id = Model.ModelId })
+    @Html.ActionLink("Back to List", "Index")
 </div>
 
 @section Scripts {

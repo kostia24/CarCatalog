@@ -24,13 +24,22 @@
         </dd>
 
     </dl>
+    @if (ViewBag.CanDelete)
+    {
+        using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
 
-    @using (Html.BeginForm()) {
-        @Html.AntiForgeryToken()
+            <div class="form-actions no-color">
+                <input type="submit" value="Delete" class="btn btn-default"/> 
 
-        <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index", new { Id = Model.BrandId })
-        </div>
+            </div>
+        }
     }
+    else
+    {
+        <h3>You must delete all cars for this model first</h3>
+    }
+    <br />
+    @Html.ActionLink("Back to List", "Index", new { Id = Model.BrandId })
 </div>

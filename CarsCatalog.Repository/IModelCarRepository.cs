@@ -10,8 +10,8 @@ namespace CarsCatalog.Repository
         IEnumerable<CarModel> GetModelsByBrandId(int? brandId);
         IQueryable<CarModel> GetAll();
 
-        OperationStatus Add(CarModel updatedModel);
-        OperationStatus Update(CarModel updatedModel);
-        OperationStatus Delete(CarModel updatedModel);
+        void Add(CarModel addedModel);
+        void Update(CarModel updatedModel);
+        void Delete(CarModel deletedModel);
     }
 }

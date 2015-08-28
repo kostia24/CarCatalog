@@ -12,13 +12,53 @@
         <h3>Create car</h3>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Model.BrandId, "Brand", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="BrandId" name="BrandId">
+                    <option value="">Please select a brand</option>
+                    @foreach (var brand in ViewBag.BrandTree)
+                    {
+                        <option value="@brand.Id">@brand.Name</option>
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => model.Model.BrandId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
         <div class="form-group">
             @Html.LabelFor(model => model.ModelId, "Model", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("ModelId", null, htmlAttributes: new { @class = "form-control" })
+                <select class="form-control" id="ModelId" name="ModelId">
+                    <option value="">Please select a model</option>
+                </select>
                 @Html.ValidationMessageFor(model => model.ModelId, "", new { @class = "text-danger" })
             </div>
         </div>
+
+
+        <script type="text/javascript">
+            var brand_model_Tree = @Html.Raw(Json.Encode(ViewBag.BrandTree));
+
+            $("#BrandId").change(function () {
+
+                var selectedContent = "";
+                var brandId = $(this).val();
+                if (brandId === "") {
+                    $("#ModelId")[0].innerHTML = "<option value=''>Please select a model</option>";
+                    return;
+                }
+
+                var models = brand_model_Tree[brandId-1].List;
+                
+                for (var i = 0; i < models.length; i++) {
+                    selectedContent += "<option value='"+models[i].Id+"' >" + models[i].Name + "</option>";
+                }
+                $("#ModelId")[0].innerHTML = selectedContent;
+            });
+        </script>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Color, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -37,16 +77,6 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label col-md-2" for="startedDate">Started price date</label>
-
-            <div class="col-md-10">
-                <input class="form-control text-box single-line valid"
-                       data-val="true" data-val-required="The started date field is required." id="startedDate" name="startedDate" type="text" value="">
-                @Html.ValidationMessage("startedDate", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
             @Html.LabelFor(model => model.EngineCapacity, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.EngineCapacity, new { htmlAttributes = new { @class = "form-control" } })
@@ -54,27 +84,27 @@
             </div>
         </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="control-label col-md-2">Upload new image:</label>
-                <div class="col-md-10">
-                    <input type="file" class="form-control" name="Image" accept="image/*" />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" value="Create" class="btn btn-default" />
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Upload new image:</label>
+            <div class="col-md-10">
+                <input type="file" class="form-control" name="Image" accept="image/*" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
 }
 
 <div>
@@ -83,13 +113,4 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-    <script src="@Url.Content("~/Scripts/jquery-ui-1.10.4.custom.js")" type="text/javascript"></script>
-
-    <script type="text/javascript">
-        $("#startedDate").datepicker({
-            changeMonth: true,
-            changeYear: true
-        });
-        $("#startedDate").datepicker("option", "dateFormat", "mm/dd/yy");
-    </script>
 }

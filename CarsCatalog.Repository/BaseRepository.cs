@@ -29,86 +29,35 @@ namespace CarsCatalog.Repository
 
         public virtual IQueryable<T> GetList(Expression<Func<T, bool>> predicate)
         {
-            try
-            {
-                return DataContext.Set<T>().Where(predicate);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-            return null;
+            return DataContext.Set<T>().Where(predicate);
         }
 
         public virtual IQueryable<T> GetAll()
         {
-            try
-            {
-                return DataContext.Set<T>();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-            return null;
+            return DataContext.Set<T>();
         }
 
-        public virtual OperationStatus Add(T entity)
+        public virtual void Add(T entity)
         {
-            OperationStatus status = new OperationStatus() { Status = true };
-            try
-            {
-                DataContext.Set<T>().Add(entity);
-                status.Status = DataContext.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                status = OperationStatus.CreateFromExeption(string.Format("Error adding {0}.", typeof(T)), ex);
-            }
-            return status;
+            DataContext.Set<T>().Add(entity);
+            DataContext.SaveChanges();
         }
 
-        public virtual OperationStatus Update(T entity)
+        public virtual void Update(T entity)
         {
-            OperationStatus status = new OperationStatus() { Status = true };
-                try
-                {
-                    DataContext.Set<T>().Attach(entity);
-                    status.Status = DataContext.SaveChanges() > 0;
-                }
-                catch (Exception ex)
-                {
-                    status = OperationStatus.CreateFromExeption(string.Format("Error updating {0}.", typeof(T)), ex);
-                }
-            return status;
+            DataContext.Set<T>().Attach(entity);
+            DataContext.SaveChanges();
         }
 
-        public virtual OperationStatus Delete(T entity)
+        public virtual void Delete(T entity)
         {
-            OperationStatus status = new OperationStatus() { Status = true };
-            try
-            {
-                DataContext.Set<T>().Remove(entity);
-                status.Status = DataContext.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                status = OperationStatus.CreateFromExeption(string.Format("Error deleting {0}.", typeof(T)), ex);
-            }
-            return status;
+            DataContext.Set<T>().Remove(entity);
+            DataContext.SaveChanges();
         }
-        public virtual OperationStatus Save()
+
+        public virtual void Save()
         {
-            OperationStatus status = new OperationStatus() { Status = true };
-            try
-            {
-                status.Status = DataContext.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                status = OperationStatus.CreateFromExeption(string.Format("Error saving {0}.", typeof(T)), ex);
-            }
-            return status;
+            DataContext.SaveChanges();
         }
 
         public void Dispose()

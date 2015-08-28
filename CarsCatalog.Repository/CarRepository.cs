@@ -12,31 +12,27 @@ namespace CarsCatalog.Repository
 
         public Car GetCarById(int? id)
         {
-            try
-            {
-                return
-                    DataContext.Cars.Include(c => c.Model).Include(m => m.Model.Brand).SingleOrDefault(c => c.Id == id);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return DataContext.Cars.Include(c => c.Model).Include(m => m.Model.Brand).SingleOrDefault(c => c.Id == id);
         }
 
-        public OperationStatus AddCarWithDate(Car car, DateTime date)
+        public IQueryable<Car> GetCarsByUserId(string userId)
         {
+            return GetList(car => car.UserId == userId);
+        }
+
+        public override void Add(Car car)
+        {
+            base.Add(car);
             _priceRepository.Add(new PriceChangeHistory()
             {
                 CarId = car.Id,
-                DateChange = date,
+                DateChange = DateTime.Today,
                 Price = car.Price
             });
-            return Add(car);
         }
 
-        public override OperationStatus Update(Car updatedCar)
+        public override void Update(Car updatedCar)
         {
-            var opStatus = new OperationStatus { Status = true };
             Car car = GetCarById(updatedCar.Id);
 
             car.EngineCapacity = updatedCar.EngineCapacity;
@@ -55,18 +51,39 @@ namespace CarsCatalog.Repository
                 });
             car.Price = updatedCar.Price;
 
-            try
-            {
-                DataContext.Entry(car).State = EntityState.Modified;
-                Save();
-            }
-            catch (Exception exp)
-            {
-                opStatus = OperationStatus.CreateFromExeption("Error updating car.", exp);
-            }
-            return opStatus;
+            DataContext.Entry(car).State = EntityState.Modified;
+            Save();
         }
 
+        public IQueryable<Car> GetCarsFromFilter(FilterParams filter)
+        {
+            IQueryable<Car> cars;
+            if (!filter.BrandId.HasValue && !filter.ModelId.HasValue)
+                cars = GetAll();
+            else
+                cars = filter.ModelId.HasValue ? GetCarsByModelId(filter.ModelId) : GetCarsByBrandId(filter.BrandId);
+
+            if (filter.Color != null)
+                cars = GetCarsByColor(cars, filter.Color);
+
+            if (filter.Engine != null)
+                cars = GetCarsByEngineCapacity(cars, filter.Engine);
+            if (filter.MinPrice.HasValue || filter.MaxPrice.HasValue || filter.Date.HasValue)
+            {
+                int min = 0;
+                int max = int.MaxValue;
+                DateTime date = DateTime.Today;
+                if (filter.MinPrice > 0)
+                    if (filter.MinPrice != null) min = filter.MinPrice.Value;
+                if (filter.MaxPrice > 0)
+                    if (filter.MaxPrice != null) max = filter.MaxPrice.Value;
+                if (filter.Date.HasValue)
+                    date = filter.Date.Value;
+                cars = GetCarsFromPriceRangeWithSpecificDate(cars, min, max, date);
+            }
+            return cars;
+
+        }
         public IQueryable<Car> GetCarsByModelId(int? modelId)
         {
             return GetList(car => car.ModelId == modelId);
@@ -77,69 +94,48 @@ namespace CarsCatalog.Repository
             return GetList(car => car.Model.BrandId == brandId);
         }
 
-        public IEnumerable<Car> GetCarsFromPageRange(IEnumerable<Car> cars, int pageNumber, int elementsPerPage,
-            out int pageCount)
+        public List<Car> GetCarsFromPageRange(IQueryable<Car> cars, int pageNumber, int elementsPerPage)
         {
             pageNumber--;
-            int count = cars.Count();
-
-            if (count % elementsPerPage == 0)
-                pageCount = count / elementsPerPage;
-            else
-            {
-                pageCount = (count / elementsPerPage);
-                pageCount++;
-            }
-            return
-                cars.OrderBy(car => car.Id)
+            return cars.OrderBy(car => car.Id)
                     .Skip(pageNumber * elementsPerPage)
-                    .Take(elementsPerPage);
+                    .Take(elementsPerPage).ToList();
         }
 
-        public IEnumerable<Car> GetCarsFromPriceRangeWithSpecificDate(IEnumerable<Car> cars, double minPrice,
-            double maxPrice, DateTime date)
+        public IQueryable<Car> GetCarsFromPriceRangeWithSpecificDate(IQueryable<Car> cars, int? minPrice,
+            int? maxPrice, DateTime? date)
         {
             date += new TimeSpan(1, 0, 0, 0);
-            var carsWithSelectedPrice = cars.Where(
-                c =>
-                {
-                    if (!c.PriceChangeHistories.Any()) return false;
-
-                    var carPrices = c.PriceChangeHistories.OrderByDescending(d => d.DateChange)
-                        .FirstOrDefault(history => history.DateChange < date);
-                    if (carPrices == null)
-                        return false;
-                    if (minPrice < carPrices.Price && carPrices.Price < maxPrice)
-                        return true;
-                    return false;
-                });
-
+            var carsWithSelectedPrice = cars.Where(c => c.PriceChangeHistories.OrderByDescending(d => d.DateChange)
+                .FirstOrDefault(history => history.DateChange < date).Price > minPrice);
+            carsWithSelectedPrice = carsWithSelectedPrice.Where(c => c.PriceChangeHistories.OrderByDescending(d => d.DateChange)
+                .FirstOrDefault(history => history.DateChange < date).Price < maxPrice);
             return carsWithSelectedPrice;
         }
 
-        public IEnumerable<Car> GetCarsByEngineCapacity(IEnumerable<Car> cars, string capacity)
+        public IQueryable<Car> GetCarsByEngineCapacity(IQueryable<Car> cars, string capacity)
         {
             return cars.Where(car => car.EngineCapacity.StartsWith(capacity));
         }
 
-        public IEnumerable<Car> GetCarsByColor(IEnumerable<Car> cars, string color)
+        public IQueryable<Car> GetCarsByColor(IQueryable<Car> cars, string color)
         {
-            return cars.Where(car => car.Color.StartsWith(color, StringComparison.OrdinalIgnoreCase));
+            return cars.Where(car => car.Color.StartsWith(color));
         }
 
-        public IEnumerable<string> DistinctCarsColor(IEnumerable<Car> cars, string startWith)
+        public IQueryable<string> DistinctCarsColor(IQueryable<Car> cars, string startWith)
         {
             return
                 cars.Select(c => c.Color)
-                    .Where(c => c.StartsWith(startWith, StringComparison.OrdinalIgnoreCase))
+                    .Where(c => c.StartsWith(startWith))
                     .Distinct();
         }
 
-        public IEnumerable<string> DistinctCarsEngineCapacity(IEnumerable<Car> cars, string startWith)
+        public IQueryable<string> DistinctCarsEngineCapacity(IQueryable<Car> cars, string startWith)
         {
             return
                 cars.Select(c => c.EngineCapacity)
-                    .Where(c => c.StartsWith(startWith, StringComparison.OrdinalIgnoreCase))
+                    .Where(c => c.StartsWith(startWith))
                     .Distinct();
         }
     }

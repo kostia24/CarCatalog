@@ -25,24 +25,16 @@ namespace CarsCatalog.Repository
             return GetList(car => car.BrandId == brandId);
         }
 
-        public override OperationStatus Update(CarModel updatedModel)
+        public override void Update(CarModel updatedModel)
         {
             var model = GetModelById(updatedModel.Id);
-            var opStatus = new OperationStatus { Status = true };
 
             model.Name = updatedModel.Name;
             model.BrandId = updatedModel.BrandId;
+            
+            DataContext.Entry(model).State = EntityState.Modified;
+            Save();
 
-            try
-            {
-                DataContext.Entry(model).State = EntityState.Modified;
-                Save();
-            }
-            catch (Exception exp)
-            {
-                opStatus = OperationStatus.CreateFromExeption("Error updating model car.", exp);
-            }
-            return opStatus;
         }
     }
 }

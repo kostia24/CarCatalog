@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Web.Mvc;
 using CarsCatalog.Models;
 using CarsCatalog.Repository;
@@ -60,9 +62,13 @@ namespace CarsCatalog.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            var brand = _brandRepository.GetBrandById(brandId);
+            if (brand == null)
+            {
+                return HttpNotFound();
+            }
 
-            ViewBag.currentbrandId = brandId;
-            ViewBag.BrandId = new SelectList(_brandRepository.GetAll(), "Id", "Name", brandId);
+            ViewBag.Brand = brand;
             return View();
         }
 
@@ -73,11 +79,23 @@ namespace CarsCatalog.Controllers
         {
             if (ModelState.IsValid)
             {
-                TempData["OperationStatus"] = _modelRepository.Add(model);
+                var opStatus = new OperationStatus { Status = true, Message = "Brand added" };
+
+                try
+                {
+                    _modelRepository.Add(model);
+                }
+                catch (Exception exp)
+                {
+                    opStatus = OperationStatus.CreateFromExeption("Error adding model car.", exp);
+                }
+
+                TempData["OperationStatus"] = opStatus;
+
                 return RedirectToAction("Index", new {Id = model.BrandId});
             }
 
-            ViewBag.BrandId = new SelectList(_brandRepository.GetAll(), "Id", "Name", model.BrandId);
+            ViewBag.Brand = model.Brand; 
             return View(model);
         }
 
@@ -105,7 +123,18 @@ namespace CarsCatalog.Controllers
         {
             if (ModelState.IsValid)
             {
-                TempData["OperationStatus"] = _modelRepository.Update(model);
+                var opStatus = new OperationStatus { Status = true, Message = "model updated" };
+
+                try
+                {
+                    _modelRepository.Update(model);
+                }
+                catch (Exception exp)
+                {
+                    opStatus = OperationStatus.CreateFromExeption("Error updating model car.", exp);
+                }
+
+                TempData["OperationStatus"] = opStatus;
                 return RedirectToAction("Index", new {Id = model.BrandId});
             }
             ViewBag.BrandId = new SelectList(_brandRepository.GetAll(), "Id", "Name", model.BrandId);
@@ -124,6 +153,7 @@ namespace CarsCatalog.Controllers
             {
                 return HttpNotFound();
             }
+            ViewBag.CanDelete = !model.Cars.Any();
             return View(model);
         }
 
@@ -133,7 +163,29 @@ namespace CarsCatalog.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             CarModel model = _modelRepository.GetModelById(id);
-            TempData["OperationStatus"] = _modelRepository.Delete(model);
+            if (model == null)
+            {
+                return HttpNotFound();
+            }
+            var opStatus = new OperationStatus { Status = true, Message = "model deleted" };
+
+            if (!model.Cars.Any())
+            {
+                try
+                {
+                    _modelRepository.Delete(model);
+                }
+                catch (Exception exp)
+                {
+                    opStatus = OperationStatus.CreateFromExeption("Error deleting model car.", exp);
+                }
+
+                TempData["OperationStatus"] = opStatus;
+            }
+            else
+                TempData["OperationStatus"] = new OperationStatus() { Status = true, Message = "You must delete all cars for this model first" };
+
+
             return RedirectToAction("Index", new {Id = model.BrandId});
         }
     }

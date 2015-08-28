@@ -7,10 +7,10 @@ namespace CarsCatalog.Repository
     public interface ICarRepository
     {
         Car GetCarById(int? id);
+        IQueryable<Car> GetCarsByUserId(string userId);
         IQueryable<Car> GetCarsByModelId(int? modelId);
-        OperationStatus AddCarWithDate(Car car, DateTime date);
-        OperationStatus Add(Car car);
-        OperationStatus Update(Car updatedCar);
-        OperationStatus Delete(Car car);
+        void Add(Car car);
+        void Update(Car updatedCar);
+        void Delete(Car car);
     }
 }

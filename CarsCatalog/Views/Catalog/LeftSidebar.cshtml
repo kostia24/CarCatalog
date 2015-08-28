@@ -7,9 +7,6 @@
 
 
 <div class="filter-parametrs">
-    <div class="filter-parametr">
-        <div id="show-all" class="btn btn-warning ">Show all cars</div>
-    </div>
     @if (Model != null)
     {
         <div class="filter-parametr">
@@ -49,12 +46,20 @@
                 Date: <br /> <input type="text" id="datepicker" class="filter-input">
             </div>
             <div>
-                $<input type="text" id="min-price" pattern="\d*" maxlength="7" size="6" class="input-small" />
-                to $<input type="text" id="max-price" pattern="\d*" maxlength="7" size="6" class="input-small" />
+                $<input type="text" id="min-price" pattern="\d*" maxlength="7" size="6" class="input-small"/>
+                to $<input type="text" id="max-price" pattern="\d*" maxlength="7" size="6" class="input-small"/>
                 <span class="price-btn">
                     <button type="submit" name="date-with-price-range" id="date-with-price-range" class="btn btn-default btn-xs">ok </button>
                 </span>
             </div>
+            <script type="text/javascript">
+                $("#datepicker").datepicker({
+                    changeMonth: true,
+                    changeYear: true
+                });
+                $("#datepicker").datepicker("option", "dateFormat", "mm/dd/yy");
+            </script>
+
         </div>
     </div>
 </div>

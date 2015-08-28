@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using CarsCatalog.Models;
 
 namespace CarsCatalog.Repository
@@ -7,8 +8,9 @@ namespace CarsCatalog.Repository
     {
         CarBrand GetBrandById(int? id);
         IQueryable<CarBrand> GetAll();
-        OperationStatus Add(CarBrand brand);
-        OperationStatus Update(CarBrand updatedBrand);
-        OperationStatus Delete(CarBrand brand);     
+        void Add(CarBrand brand);
+        void Update(CarBrand updatedBrand);
+        void Delete(CarBrand brand);
+        IList<BrandModelsTree> GetBrandsModelsTree();
     }
 }

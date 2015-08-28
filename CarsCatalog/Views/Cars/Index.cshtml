@@ -1,26 +1,25 @@
 ﻿@model IEnumerable<CarsCatalog.Models.Car>
 
 @{
-    ViewBag.Title = ViewBag.model.Name;
+    ViewBag.Title = "My cars";
     var opStatus = TempData["OperationStatus"] as CarsCatalog.Models.OperationStatus;
 }
 <h3>
-    @ViewBag.model.Brand.Name
-    @ViewBag.model.Name
+   My cars
 </h3>
-@if (Request.IsAuthenticated && User.IsInRole("admin"))
+@if (Request.IsAuthenticated)
 {
     <p>
-        @Html.ActionLink("Create New", "Create", new { modelId = ViewBag.model.Id })
+        @Html.ActionLink("Create New", "Create")
     </p>
 }
-@if (opStatus != null && opStatus.Status == false)
+@if (opStatus != null)
 {
-    <h4 class="text-danger">status.Message </h4>
+    <h4 class="@(opStatus.Status ? "text-success" : "text-danger") ">@opStatus.Message </h4>
 }
 @if (!Model.Any())
 {
-    <h3>No cars in this model </h3>
+    <h3>You do not added a car yet </h3>
 }
 else
 {
@@ -69,7 +68,7 @@ else
                         </dl>
                         <div class="text-center">
                             @Html.ActionLink("Details", "Details", new { id = car.Id })
-                            @if (Request.IsAuthenticated && User.IsInRole("admin"))
+                            @if (Request.IsAuthenticated)
                             {
                                 @:|
                                 @Html.ActionLink("Edit", "Edit", new { id = car.Id })
@@ -86,9 +85,6 @@ else
 <br />
 <br />
 
-<p style="width: 100%">
-    @Html.ActionLink("Back to models", "Index", "Models", new { id = ViewBag.model.BrandId }, null)
-</p>
 @section scripts
 {
     <script type="text/javascript">

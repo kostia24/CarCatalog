@@ -44,13 +44,12 @@
     <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountViewModels.cs" />
-    <Compile Include="BrandModelsTree.cs" />
     <Compile Include="Car.cs" />
     <Compile Include="CarBrand.cs" />
     <Compile Include="CarModel.cs" />
-    <Compile Include="ManageViewModels.cs" />
+    <Compile Include="FilterParams.cs" />
     <Compile Include="OperationStatus.cs" />
+    <Compile Include="PagingInfo.cs" />
     <Compile Include="PriceChangeHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

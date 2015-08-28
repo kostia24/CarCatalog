@@ -5,10 +5,6 @@ namespace CarsCatalog.Models
 {
     public class CarModel
     {
-        public CarModel()
-        {
-            Cars = new HashSet<Car>();
-        }
         [Required]
         public int Id{ get; set; }
         [Display(Name = "Model")]
@@ -18,6 +14,6 @@ namespace CarsCatalog.Models
         [Required]
         public int BrandId{ get; set; }
         public virtual CarBrand Brand{ get; set; }
-        public ICollection<Car> Cars{ get; set; }
+        public virtual ICollection<Car> Cars { get; set; }
     }
 }

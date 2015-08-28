@@ -2,296 +2,305 @@
     _this = this;
 
     var Url = "/Catalog/";
-    var lastFullUrl = "";
 
     this.init = function () {
-        this.ContentResizing();
+
         this.columnsCount = 4;
-        this.PageNumber = 1;
-        this.BrandModelFilterString = null;
-        this.ShowAll();
-        this.BrandClick();
-        this.ModelClick();
-        this.ColorFilterAutocomplete();
-        this.EngineCapacityFilterAutocomplete();
-        this.DatePriceRange();
-        this.ElementsOnPage();
-        this.ElementsOnColumns();
-        this.CreatePage(1);
+        this.rowsCount = 5;
+        this.contentResizing();
     };
 
-    var getContentFromUrl = function (getElementsQuery, value) {
-        var fullUrl = Url + getElementsQuery + value;
-        if (_this.BrandModelFilterString != null)
-            fullUrl += _this.BrandModelFilterString;
-        lastFullUrl = fullUrl;
-        $.get(fullUrl, function (data) {
-            $("#mainCarList")[0].innerHTML = data;
-            $("#paging-navigation")[0].innerHTML = "";
-            _this.ContentResizing();
-            _this.CreatePage(1);
+    // parse url parameters into object
+    var parseUrl = function (url) {
+        var result = {};
+        url.split("&").forEach(function (part) {
+            var item = part.split("=");
+            result[item[0]] = decodeURIComponent(item[1]);
         });
-    };
-
-    var autocompleteFieldFilter = function (selector, distinctQuery, getElementsQuery) {
-        $(selector).autocomplete({
-            source: function (request, response) {
-                var value = $(selector).val();
-                var fullUrl = Url + distinctQuery + value;
-
-                if (_this.BrandModelFilterString != null)
-                    fullUrl += _this.BrandModelFilterString;
-
-                lastFullUrl = fullUrl;
-                $.getJSON(fullUrl, function (data) {
-                    response(data);
-                });
-            },
-            select: function (event, ui) {
-                getContentFromUrl(getElementsQuery, ui.item.value);
+        return result;
+    }
+    // from parameters build url
+    var buildUrl = function (parameters) {
+        var res = [];
+        for (var p in parameters) {
+            if (parameters.hasOwnProperty(p)) {
+                if (p === "page")
+                    continue;
+                res.push(encodeURIComponent(p) + "=" + encodeURIComponent(parameters[p]));
             }
+        }
+        return res.join("&");
+    };
+    // get main content from url
+    var getContentFromUrl = function (urlSearch) {
+
+        var queryUrl = "/Catalog/GetCars" + urlSearch;
+
+        $.get(queryUrl, function (data) {
+            $("#main-car-list")[0].innerHTML = data;
+            window.history.replaceState({ "html": data }, "", urlSearch);
+            _this.pageLinkClickHandler();
+            _this.resetFilterHandler();
+            _this.contentResizing(); //fix content size
         });
     };
 
-    var fillAutocompletedContent = function (selector, getElementsQuery) {
-        $(selector).on("change paste keyup ", function () {
-            var value = $(selector).val();
-            getContentFromUrl(getElementsQuery, value);
-        });
-    };
+    // add filter to url and load data
+    var addParamsToUrl = function (params) {
+        var isNew = location.search === "";
+        var urlParams = {};
+        if (!isNew)
+            urlParams = parseUrl(location.search.substr(1));
 
-    var elementsOnPageChanged = function () {
-        var elementsOnPage = $("#ElementsPerPageList").val();
-        document.cookie = "elementsPerPage=" + elementsOnPage;
-        _this.columnsCount = $("#ColumnsList").val();
-        var fullUrl = Url + "SetElementsCountOnPage?elementsCount=" + elementsOnPage + "&columns=" + _this.columnsCount;
+        for (var p in params) {
+            if (params.hasOwnProperty(p)) {
+                urlParams[p] = params[p];
+            }
+        }
+        var urlSearch = "?" + buildUrl(urlParams);
+        getContentFromUrl(urlSearch);
+    }
+    // remove filter
+    var removeFilters = function (parameters) {
+        var isNew = location.search === "";
+        var urlParams = {};
+        if (!isNew)
+            urlParams = parseUrl(location.search.substr(1));
+        else
+            return "/";
+
+        for (var i = 0; i < parameters.length; i++) {
+            delete urlParams[parameters[i]];
+        }
+        return "?" + buildUrl(urlParams);
+    }
+
+    // create new dropdown list for items count on page when columns count changed
+    var newElementsOnPageList = function () {
+        var selectedContent = "";
+        for (var row = 3; row < 10; row++) {
+            if (row === 5) // selected by default
+                selectedContent += "<option selected>" + row * _this.columnsCount + "</option>";
+            else
+                selectedContent += "<option>" + row * _this.columnsCount + "</option>";
+        }
+        $("#elements-per-page-list")[0].innerHTML = selectedContent;
+    };
+    // set numbers columns and rows
+    var setItemsCountOnPage = function () {
+        var elementsOnPage = $("#elements-per-page-list").val();
+        _this.columnsCount = $("#columns-list").val();
+        _this.rowsCount = elementsOnPage / _this.columnsCount;
+        document.cookie = "rows=" + _this.rowsCount;
+
+        var fullUrl = Url + "SetElementsCountOnPage?rows=" + _this.rowsCount + "&columns=" + _this.columnsCount;
         $.get(fullUrl, function (data) {
             if (data === "ok") {
                 $("#main-content").css("min-width", (500 + _this.columnsCount * 20) + "px");
-                if (lastFullUrl === "")
-                    lastFullUrl = Url + "GetCars?";
-                $.get(lastFullUrl, function (dataCArs) {
-                    $("#mainCarList")[0].innerHTML = dataCArs;
-                    $("#paging-navigation")[0].innerHTML = "";
-                    _this.ContentResizing();
-                    _this.CreatePage(1);
-                });
+
+                var url = removeFilters(["page"]);
+                getContentFromUrl(url);
             }
         });
     };
-
-    var newElementsOnPageList = function () {
-        var selectedContent = "";
-        for (var i = _this.columnsCount * 3; i <= _this.columnsCount * 7; i++) {
-            if (i % _this.columnsCount === 0) {
-                if (i === _this.columnsCount * 5)
-                    selectedContent += "<option selected>" + i + "</option>";
-                else
-                    selectedContent += "<option>" + i + "</option>";
-            }
-        }
-        $("#ElementsPerPageList")[0].innerHTML = selectedContent;
-
-        document.cookie = "elementsPerPage=" + (_this.columnsCount * 5);
-        elementsOnPageChanged();
-    };
-
-    var pageNextLinkClickHendler = function (pageNumber) {
-        $("#page-next").click(function () {
-            if (lastFullUrl === "")
-                lastFullUrl = Url + "GetCars?";
-            var fullUrl = lastFullUrl + "&page=" + (pageNumber + 1);
-            $.get(fullUrl, function (data) {
-                $(".page-content").fadeOut(300)
-                 .promise().done(function () {
-                     $("#mainCarList").append(data);
-                     _this.ContentResizing();
-                     $("#page" + (pageNumber+1)).fadeIn(300);
-                 });
-                $(".pageLink").addClass(" btn-default");
-                $(".pageLink").removeClass("selected btn-primary");
-                _this.CreatePage(pageNumber + 1);
-            });
+    
+    // change items count
+    this.itemsCountOnPageHandler = function () {
+        $("#elements-per-page-list").change(function () {
+            setItemsCountOnPage();
         });
     };
-
-    var pageLinkClickHendler = function () {
-        $(".pageLink").click(function () {
-            var pageid = this.id;
-            var id = (/\d+$/).exec(pageid);
-
-            $(".pageLink").removeClass("selected btn-primary");
-            $(".pageLink").addClass(" btn-default");
-            $(this).addClass("selected btn-primary");
-
-
-            if ($("#page" + id)[0] == null) {
-                if (lastFullUrl === "")
-                    lastFullUrl = Url + "GetCars?";
-                var fullUrl = lastFullUrl + "&page=" + (id);
-                $.get(fullUrl, function (data) {
-                    $(".page-content").fadeOut(300)
-                        .promise().done(function () {
-                            $("#mainCarList").append(data);
-                            _this.ContentResizing();
-                         $("#page" + id).fadeIn(300);
-                    });
-
-                    $(".pageLink").removeClass("selected btn-default");
-                    $(this).addClass(" btn-primary");
-                });
-            }
-            else {
-                $(".page-content").fadeOut(300)
-                    .promise().done(function () { $("#page" + id).fadeIn(200) });
-            }
-        });
-    };
-
-    var resetFilters = function () {
-        $("#engine-capacity-autocomplete").val("");
-        $("#color-autocomplete").val("");
-    };
-
-    this.CreatePage = function (pageNumber) {
-        if ($(".page-count")[0] == null)
-            return;
-        var pageCount = $(".page-count")[0].innerText;
-        if (pageNumber <= 5) {
-            _this.CreateFirstsPages();
-            return;
-        }
-        var pageNumberContent;
-
-        if (pageCount > 5) {
-            var pageTag = ' <div id="page-link' + pageNumber + '" class="pageLink btn btn-primary">' + pageNumber + ' </div>';
-            var pageNext = '<div id="page-next" class="nextPageLink btn btn-default">next</div>';
-            $("#page-next").remove();
-            if (pageNumber == pageCount) {
-                pageNumberContent = pageTag;
-                $("#paging-navigation").append(pageNumberContent);
-                pageLinkClickHendler();
-            } else {
-                pageNumberContent = pageTag + pageNext;
-                $("#paging-navigation").append(pageNumberContent);
-                pageLinkClickHendler();
-                pageNextLinkClickHendler(pageNumber);
-            }
-        }
-    };
-
-    this.CreateFirstsPages = function () {
-        var pageCount = $(".page-count")[0].innerText;
-        if (pageCount < 2)
-            return;
-
-        var pageNumberContent = ' <div id="page-link1" class="pageLink btn btn-primary">1 </div>';
-        
-        for (var i = 2; i <= pageCount; i++) {
-            if (i > 5)
-                break;
-            pageNumberContent += ' <div id="page-link' + i + '" class="pageLink btn btn-default">' + i + ' </div>';
-        }
-        $("#paging-navigation").append(pageNumberContent);
-        pageLinkClickHendler();
-
-        if (pageCount > 5) {
-            var pageNext = '<div id="page-next" class="nextPageLink btn btn-default">next</div>';
-            $("#paging-navigation").append(pageNext);
-            pageNextLinkClickHendler(5);
-        }
-    };
-
-    this.ElementsOnPage = function () {
-        $("#ElementsPerPageList").change(function () {
-            elementsOnPageChanged();
-        });
-    };
-
-    this.ElementsOnColumns = function () {
-        $("#ColumnsList").change(function () {
-            _this.columnsCount = $("#ColumnsList").val();
-            var mainWidth = $("#mainCarList").width();
+    // change columns count
+    this.columnsCountChangedHandler = function () {
+        $("#columns-list").change(function () {
+            _this.columnsCount = $("#columns-list").val();
+            var mainWidth = $("#main-car-list").width();
             document.cookie = "columns=" + _this.columnsCount;
-            newElementsOnPageList(_this.columnsCount);
-
+            newElementsOnPageList(); // create new dropdown list for items count on page for new columns count
+            setItemsCountOnPage(); // change content
             $(".car-wrapper").width(mainWidth / _this.columnsCount);
         });
     };
 
-    this.ShowAll = function () {
-        $("#show-all").click(function () {
-            _this.BrandModelFilterString = "";
-            resetFilters();
-            getContentFromUrl("GetCars?", "");
-        });
+    // remove concrete filter
+    this.resetFilterHandler = function () {
+        if ($(".selected-filter") != null) {
+            $(".selected-filter").click(function () {
+                var id = this.id;
+                var urlUpdate = "/";
+                if (id === "remove-brand-filter") {
+                    urlUpdate = removeFilters(["BrandId"]);
+                }
+                if (id === "remove-model-filter") {
+                    urlUpdate = removeFilters(["ModelId"]);
+                }
+                if (id === "remove-color-filter") {
+                    urlUpdate = removeFilters(["Color"]);
+                    $("#color-autocomplete").val("");
+                }
+                if (id === "remove-engine-filter") {
+                    urlUpdate = removeFilters(["Engine"]);
+                    $("#engine-capacity-autocomplete").val("");
+                }
+                if (id === "remove-price-filter") {
+                    urlUpdate = removeFilters(["MinPrice", "MaxPrice", "Date"]);
+                    $("#datepicker").val("");
+                    $("#min-price").val("");
+                    $("#max-price").val("");
+                }
+                if (id === "remove-all-filters") {
+                    $("#engine-capacity-autocomplete").val("");
+                    $("#color-autocomplete").val("");
+                    $("#datepicker").val("");
+                    $("#min-price").val("");
+                    $("#max-price").val("");
+                }
+                getContentFromUrl(urlUpdate);
+            });
+        }
     };
-
-    this.BrandClick = function () {
-        $(".brand").click(function () {
-            var id = this.id;
-            resetFilters();
-            _this.BrandModelFilterString = "";
-            getContentFromUrl("GetCarsByBrand?brandId=", id);
-            _this.BrandModelFilterString = "&brandId=" + id;
-        });
-    };
-
-    this.ModelClick = function () {
-        $(".model").click(function () {
-            var id = this.id;
-            resetFilters();
-            _this.BrandModelFilterString = "";
-            getContentFromUrl("GetCarsByModel?modelId=", id);
-            _this.BrandModelFilterString = "&modelId=" + id;
-        });
-    };
-
-    this.DatePriceRange = function () {
-
-        $("#datepicker").datepicker({
-            changeMonth: true,
-            changeYear: true
-        });
-        $("#datepicker").datepicker("option", "dateFormat", "mm/dd/yy");
-
-        $("#date-with-price-range").click(function () {
-            resetFilters();
-            var date = $("#datepicker").val();
-            var min = $("#min-price").val();
-            var max = $("#max-price").val();
-            var checkDate = Date.parse(date);
-            if (date != null && max != null && min && !isNaN(checkDate) && !isNaN(min) && !isNaN(max))
-                getContentFromUrl("GetCarsByPrice?date=" + date + "&min=" + min + "&max=", max);
-            else alert("Please verify input data");
-        });
-    };
-
-    this.ColorFilterAutocomplete = function () {
-        autocompleteFieldFilter("#color-autocomplete", "GetDistinctColors?color=", "GetCarsByColor?color=");
-        fillAutocompletedContent("#color-autocomplete", "GetCarsByColor?color=");
-    };
-
-    this.EngineCapacityFilterAutocomplete = function () {
-        autocompleteFieldFilter("#engine-capacity-autocomplete", "GetDistinctEngineCapacity?capacity=", "GetCarsByEngineCapacity?capacity=");
-        fillAutocompletedContent("#engine-capacity-autocomplete", "GetCarsByEngineCapacity?capacity=");
-    };
-    this.ContentResizing = function() {
+    this.contentResizing = function () {
         var carImgWidth = $(".car-img-wrap").width();
         $(".car-img-wrap").height(carImgWidth * 0.8);
 
-        _this.columnsCount = $("#ColumnsList").val();
-        $("#main-content").css("min-width", (500 + _this.columnsCount * 20) + "px");
+        _this.columnsCount = $("#columns-list").val();
+        var contWidth = 670 + _this.columnsCount * 50;
+        $(".main-container").css("min-width", contWidth + "px");
+
 
         $("#main-content").css("padding", (_this.columnsCount * 2) + "px");
 
         $(window).resize(function () {
             var carImgWidth = $(".car-img-wrap").width();
             $(".car-img-wrap").height(carImgWidth * 0.8);
+            $("#main-content").css("width", (contWidth - $("#left-sidebar").width - 20) + "px");
         });
+    };
+
+    this.brandClick = function () {
+        $(".brand").click(function () {
+            var id = this.id;
+            var urlSearch = removeFilters(["ModelId"]);
+            window.history.replaceState({}, "", urlSearch);
+
+            addParamsToUrl({ "BrandId": id });
+        });
+    };
+
+    this.modelClick = function () {
+        $(".model").click(function () {
+            var id = this.id;
+            addParamsToUrl({ "ModelId": id });
+        });
+    };
+
+    this.datePriceRange = function () {
+        $("#date-with-price-range").click(function () {
+
+            var params = {};
+
+            var date = $("#datepicker").val();
+            var min = $("#min-price").val();
+            var max = $("#max-price").val();
+
+            if (!isNaN(min))
+                params["MinPrice"] = min;
+
+            if (!isNaN(max))
+                params["MaxPrice"] = max;
+
+            var checkDate = Date.parse(date);
+            if (!isNaN(checkDate) || date === "")
+                params["Date"] = date;
+            else
+                alert("wrong date format");
+
+            if (params[0] !== null)
+                addParamsToUrl(params);
+        });
+    };
+    // navigate on page
+    this.pageLinkClickHandler = function () {
+        $(".page-link").click(function (event) {
+            var pageLink = $(this).attr("href");
+            event.preventDefault();
+            getContentFromUrl(pageLink);
+        });
+    };
+
+    //get distinct data source and add filter
+    this.autocompleteFieldFilter = function (selector, distinctMethod, filterName) {
+        $(selector).autocomplete({
+            source: function (request, response) {
+                var urlParams = location.search;
+                var fullUrl = Url + distinctMethod + urlParams;
+                $.getJSON(fullUrl, function (data) {
+                    response(data);
+                });
+            },
+            select: function (event, ui) {
+                var params = {};
+                params[filterName] = ui.item.value;
+                addParamsToUrl(params);
+            }
+        });
+    };
+    // add filter for autocompleting fields when typing
+    this.fillAutocompletedContent = function (selector, getElementsQuery) {
+        $(selector).on("change paste keyup ", function () {
+            var value = $(selector).val();
+            var params = {};
+            params[getElementsQuery] = value;
+            addParamsToUrl(params);
+        });
+    };
+
+    // restore filers state from url
+    this.restoreFiltersState = function () {
+        var urlParams = parseUrl(location.search.substr(1));
+        if (urlParams["Engine"] != null)
+            $("#engine-capacity-autocomplete").val(urlParams["Engine"]);
+
+        if (urlParams["Color"] != null)
+            $("#color-autocomplete").val(urlParams["Color"]);
+
+        if (urlParams["Date"] != null)
+            $("#datepicker").val(urlParams["Date"]);
+
+        if (urlParams["MinPrice"] !== "")
+            $("#min-price").val(urlParams["MinPrice"]);
+
+        if (urlParams["MaxPrice"] != null)
+            $("#max-price").val(urlParams["MaxPrice"]);
     }
+
 }
 
 viewCars = null;
 viewCars = new ViewCars();
 viewCars.init();
+
+viewCars.brandClick();
+viewCars.modelClick();
+viewCars.datePriceRange();
+
+//get distinct colors source and filter selected value
+viewCars.autocompleteFieldFilter("#color-autocomplete", "GetDistinctColors", "Color");
+// add filter color when typing
+viewCars.fillAutocompletedContent("#color-autocomplete", "Color");
+
+//get distinct engine source and filter selected value
+viewCars.autocompleteFieldFilter("#engine-capacity-autocomplete", "GetDistinctEngineCapacity", "Engine");
+// add filter engine when typing
+viewCars.fillAutocompletedContent("#engine-capacity-autocomplete", "Engine");
+
+viewCars.pageLinkClickHandler();
+// restore filers state from url
+viewCars.restoreFiltersState();
+
+// handle removing filter
+viewCars.resetFilterHandler();
+// change items count on page
+viewCars.itemsCountOnPageHandler();
+// change columns count
+viewCars.columnsCountChangedHandler();

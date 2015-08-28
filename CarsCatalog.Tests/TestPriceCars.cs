@@ -76,7 +76,7 @@ namespace CarsCatalog.Tests
                         new PriceChangeHistory(){Price = 55000, CarId = 5 , DateChange = new DateTime(2015, 8, 5)}
                     }
                 },
-            };
+            }.AsQueryable();
             var target = GetTarget();
             var carInput = GetCarTarget();
             // act

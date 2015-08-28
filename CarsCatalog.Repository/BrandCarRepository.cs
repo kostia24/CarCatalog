@@ -6,7 +6,7 @@ using CarsCatalog.Models;
 
 namespace CarsCatalog.Repository
 {
-    public class BrandCarRepository : BaseRepository<CatalogDbContext, CarBrand>, IBrandCarTreeRepository, IBrandRepository
+    public class BrandCarRepository : BaseRepository<CatalogDbContext, CarBrand>, IBrandRepository
     {
         public CarBrand GetBrandById(int? id)
         {
@@ -18,25 +18,17 @@ namespace CarsCatalog.Repository
             {
                 return null;
             }
-            
+
         }
-        public override OperationStatus Update(CarBrand updatedBrand)
+        public override void Update(CarBrand updatedBrand)
         {
             var brand = GetBrandById(updatedBrand.Id);
-            var opStatus = new OperationStatus { Status = true };
 
             brand.Name = updatedBrand.Name;
 
-            try
-            {
-                DataContext.Entry(brand).State = EntityState.Modified;
-                Save();
-            }
-            catch (Exception exp)
-            {
-                opStatus = OperationStatus.CreateFromExeption("Error updating brand car.", exp);
-            }
-            return opStatus;
+            DataContext.Entry(brand).State = EntityState.Modified;
+            Save();
+
         }
 
         public IList<BrandModelsTree> GetBrandsModelsTree()
@@ -48,23 +40,23 @@ namespace CarsCatalog.Repository
                 try
                 {
                     var brands = DataContext.Brands.Include(m => m.Models);
-                     foreach (var brand in brands)
-                {
-                    BrandModelsTree brandNode = new BrandModelsTree() { Id = brand.Id, Name = brand.Name, Type = "brand" };
-                    foreach (var modelNode in brand.Models.Select(model => new BrandModelsTree() { Id = model.Id, Name = model.Name, Type = "model" }))
+                    foreach (var brand in brands)
                     {
-                        brandNode.List.Add(modelNode);
+                        BrandModelsTree brandNode = new BrandModelsTree() { Id = brand.Id, Name = brand.Name, Type = "brand" };
+                        foreach (var modelNode in brand.Models.Select(model => new BrandModelsTree() { Id = model.Id, Name = model.Name, Type = "model" }))
+                        {
+                            brandNode.List.Add(modelNode);
+                        }
+                        brandsList.Add(brandNode);
                     }
-                    brandsList.Add(brandNode);
-                }
-     
+
                 }
                 catch (Exception)
                 {
                     return null;
                 }
             }
-               
+
             return brandsList;
         }
     }

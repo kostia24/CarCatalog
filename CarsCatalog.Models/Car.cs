@@ -27,8 +27,10 @@ namespace CarsCatalog.Models
         public byte[] ImageData { get; set; }
         [HiddenInput(DisplayValue = false)]
         public string ImageMimeType { get; set; }
-
+        [Required]
         public int ModelId{ get; set; }
+
+        public string UserId { get; set; }
         public virtual ICollection<PriceChangeHistory> PriceChangeHistories { get; set; } 
 
         public virtual CarModel Model{ get; set; }

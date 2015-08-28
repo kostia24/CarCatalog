@@ -7,10 +7,10 @@
 
 <div>
     <h3>Car details</h3>
-    <hr />
+    <hr/>
     @if (Model.ImageData != null)
     {
-        <img src="@Url.Action("GetImage", "Cars", new {Model.Id})" />
+        <img src="@Url.Action("GetImage", "Cars", new {Model.Id})"/>
 
     }
     <dl class="dl-horizontal">
@@ -67,16 +67,35 @@
     </dl>
     <h4>Dynamics changing price on car</h4>
     <div id="chartdiv">
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    Date
+                </th>
+                <th>Price</th>
+            </tr>
+
+            @foreach (var item in ViewBag.datePrices)
+            {
+                <tr>
+                    <td>
+                        @item.DateChange.ToString("d")
+                    </td>
+                    <td class="text-price">
+                        @item.Price.ToString("c0")
+                    </td>
+                </tr>
+            }
+        </table>
     </div>
-    <script type="text/javascript">
-        var chartData = @Html.Raw(Json.Encode(ViewBag.PriceHistory));
-    </script>
+
 </div>
+<a href="@Request.UrlReferrer">Back</a>
 @if (Request.IsAuthenticated && User.IsInRole("admin"))
 {
     <p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-        @Html.ActionLink("Back to List", "Index", new { id = Model.ModelId })
+       
+        @Html.ActionLink("Back to List", "Index", new {id = Model.ModelId})
     </p>
 }
 @section scripts

@@ -7,9 +7,14 @@ namespace CarsCatalog.Repository
 {
     public class ChangePriceRepository : BaseRepository<CatalogDbContext, PriceChangeHistory>, IPriceRepository
     {
-        public IEnumerable<PriceChangeHistory> GetListPriceCars(IEnumerable<Car> cars, int minPrice, int maxPrice, DateTime date )
+        public IEnumerable<PriceChangeHistory> GetListPriceCars(IEnumerable<Car> cars, int? minPrice, int? maxPrice, DateTime date )
         {
             date += new TimeSpan(1, 0, 0, 0);
+            if (!minPrice.HasValue)
+                minPrice = 0;
+            if (!maxPrice.HasValue)
+                maxPrice = int.MaxValue;
+
             return cars.Select(
                     c =>
                         c.PriceChangeHistories.OrderByDescending(pr=>pr.DateChange).First(

@@ -24,7 +24,6 @@ namespace CarsCatalog.Models
                     {
                         if (_instance != null) return _instance;
                         _instance = new UnityContainer();
-                        _instance.RegisterType<IBrandCarTreeRepository, BrandCarRepository>();
                         _instance.RegisterType<IBrandRepository, BrandCarRepository>();
                         _instance.RegisterType<IModelCarRepository, ModelCarRepository>();
                         _instance.RegisterType<ICarFiltersRepository, CarRepository>();

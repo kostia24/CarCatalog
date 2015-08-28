@@ -1,35 +1,60 @@
-﻿@model IEnumerable<CarsCatalog.Models.Car>
+﻿@using CarsCatalog.Helpers
+@model CarsCatalog.Models.CarsListViewModel
+
+<div class="additional-research">
+
+    @Html.ResetFilter(Model.FilterParams, (string)ViewBag.BrandName, (string)ViewBag.ModelName)
+</div>
 
 <div id="page@(ViewBag.CurrentPageNumber)" class="page-content">
-
-    @foreach (var car in Model)
+    @if (Model.Cars.Any())
     {
-        <div class="car-wrapper" style='width: @(100/@ViewBag.Columns-2)%;'>
-            <div id="car@(car.Id)" class="car">
-                <div class="full-info">
-                    <div class="car-img-wrap">
-                        <div class="car-img-content">
-                            <a href="@Url.Action("Details", "Cars", new {id = car.Id})">
-                                <div class="img-link-wrap">
-                                    <img src="@( (car.ImageData != null) ?
-                                                     Url.Action("GetImage", "Cars", new {car.Id}):
-                                                     Url.Content("Content/empty.jpg"))" c class="car-img" />
+        foreach (var car in Model.Cars)
+        {
+            <div class="car-wrapper" style='width: @(100/@ViewBag.Columns - 2)%;'>
+                <div id="car@(car.Id)" class="car">
+                    <div class="full-info">
+                        <div class="car-img-wrap">
+                            <div class="car-img-content">
+                                <a href="@Url.Action("Details", "Cars", new {id = car.Id})">
+                                    <div class="img-link-wrap">
+                                        <img src="@( (car.ImageData != null) ?
+                                                         Url.Action("GetImage", "Cars", new {car.Id}) :
+                                                         Url.Content("Content/empty.jpg"))" c class="car-img"/>
 
-                                </div>
-                            </a>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
+                        <div class="car-details-link text-center">
+                            @Html.ActionLink(car.Model.Brand.Name + " " + car.Model.Name, "Details", "Cars", new {id = car.Id}, null)
+                        </div>
+                        <div class="car-param">
+                            @(car.Color) color <br/>
+                        </div>
+                        <div class="car-param">Engine: @(car.EngineCapacity)L </div>
+                        <div class="car-param text-price "> @(car.Price.ToString("c0"))</div>
                     </div>
-                    <div class="car-details-link text-center">
-                        @Html.ActionLink(car.Model.Brand.Name + " " + car.Model.Name, "Details", "Cars", new { id = car.Id }, null)
-                    </div>
-                    <div class="car-param">
-                        @(car.Color) color <br />
-                    </div>
-                    <div class="car-param">Engine: @(car.EngineCapacity)L </div>
-                    <div class="car-param text-price "> @(car.Price.ToString("c0"))</div>
                 </div>
             </div>
-        </div>
+        }
+    }
+    else
+    {
+        <h2>Your search did not match any cars</h2>
     }
 </div>
-<div class="page-count">@ViewBag.pageCount</div>
+<div id="paging-navigation" class="btn-group">
+    @Html.PageLinks(Model.PagingInfo, n => Url.Action("Index", new
+    {
+        Model.FilterParams.BrandId,
+        Model.FilterParams.ModelId,
+        Model.FilterParams.Color,
+        Model.FilterParams.Engine,
+        Model.FilterParams.MinPrice,
+        Model.FilterParams.MaxPrice,
+        Model.FilterParams.Date,
+        page = n
+    }))
+</div>
+<div class="page-count">@Model.PagingInfo.TotalPages</div>

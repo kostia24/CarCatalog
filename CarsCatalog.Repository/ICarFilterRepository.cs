@@ -10,16 +10,15 @@ namespace CarsCatalog.Repository
         IQueryable<Car> GetAll();
         IQueryable<Car> GetCarsByModelId(int? modelId);
         IQueryable<Car> GetCarsByBrandId(int? brandId);
+        IQueryable<Car> GetCarsFromFilter(FilterParams filter);
+        List<Car> GetCarsFromPageRange(IQueryable<Car> cars, int pageNumber, int elementsPerPage);
 
-        IEnumerable<Car> GetCarsFromPageRange(IEnumerable<Car> cars, int pageNumber, int elementsPerPage,
-            out int pageCount);
+        IQueryable<Car> GetCarsFromPriceRangeWithSpecificDate(IQueryable<Car> cars, int? minPrice, int? maxPrice,
+            DateTime? date);
 
-        IEnumerable<Car> GetCarsFromPriceRangeWithSpecificDate(IEnumerable<Car> cars, double minPrice, double maxPrice,
-            DateTime date);
-
-        IEnumerable<Car> GetCarsByEngineCapacity(IEnumerable<Car> cars, string capacity);
-        IEnumerable<Car> GetCarsByColor(IEnumerable<Car> cars, string color);
-        IEnumerable<string> DistinctCarsColor(IEnumerable<Car> cars, string startWith);
-        IEnumerable<string> DistinctCarsEngineCapacity(IEnumerable<Car> cars, string startWith);
+        IQueryable<Car> GetCarsByEngineCapacity(IQueryable<Car> cars, string capacity);
+        IQueryable<Car> GetCarsByColor(IQueryable<Car> cars, string color);
+        IQueryable<string> DistinctCarsColor(IQueryable<Car> cars, string startWith);
+        IQueryable<string> DistinctCarsEngineCapacity(IQueryable<Car> cars, string startWith);
     }
 }
