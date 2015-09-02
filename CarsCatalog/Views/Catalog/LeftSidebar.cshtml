@@ -30,27 +30,29 @@
     <div class="filter-parametr">
         <h4 class="filter-parametr-title">Color</h4>
         <div class="filter-parametr-content">
-            <input id="color-autocomplete" class="filter-input" type="text" value="" />
+            <input id="color-autocomplete" class="filter-input" type="text" value=""
+                    data-bind="autoComplete: { observe: Color, methodForDistinct: '/Catalog/GetDistinctColors'}" />
         </div>
     </div>
     <div class="filter-parametr">
         <h4 class="filter-parametr-title">Engine capacity</h4>
         <div class="filter-parametr-content">
-            <input id="engine-capacity-autocomplete" class="filter-input" type="number" value="" />
+            <input id="engine-capacity-autocomplete" class="filter-input" type="number" value="" 
+                   data-bind="autoComplete:  { observe: Engine, methodForDistinct: '/Catalog/GetDistinctEngineCapacity'}" />
         </div>
     </div>
     <div class="filter-parametr">
         <h4 class="filter-parametr-title">Price</h4>
         <div class="filter-parametr-content">
             <div>
-                Date: <br /> <input type="text" id="datepicker" class="filter-input">
+                Date: <br /> <input type="text" id="datepicker" class="filter-input" data-bind="value: Date">
             </div>
             <div>
-                $<input type="text" id="min-price" pattern="\d*" maxlength="7" size="6" class="input-small"/>
-                to $<input type="text" id="max-price" pattern="\d*" maxlength="7" size="6" class="input-small"/>
-                <span class="price-btn">
-                    <button type="submit" name="date-with-price-range" id="date-with-price-range" class="btn btn-default btn-xs">ok </button>
-                </span>
+                $<input type="text" id="min-price" pattern="\d*" maxlength="7" size="6" class="input-small" data-bind="value: MinPrice" />
+                to $<input type="text" id="max-price" pattern="\d*" maxlength="7" size="6" class="input-small" data-bind="value: MaxPrice" />
+                @*<span class="price-btn">
+                    <button type="submit" name="date-with-price-range" id="date-with-price-range" class="btn btn-default btn-xs" data-bind="click: chosePriceWithDate">ok </button>
+                </span>*@
             </div>
             <script type="text/javascript">
                 $("#datepicker").datepicker({
@@ -69,12 +71,12 @@
     foreach (var brand in brands)
     {
         <li>
-            <div id="@brand.Id" class="btn btn-primary btn-sm @brand.Type">@brand.Name</div>
+            <div id="@brand.Id" class="btn btn-primary btn-sm @brand.Type" data-bind="click: choseBrand">@brand.Name</div>
             <ul>
                 @foreach (var carModel in brand.List)
                 {
                     <li id="@carModel.Id" class="@carModel.Type">
-                        <div class="btn btn-info btn-sm">@carModel.Name</div>
+                        <div class="btn btn-info btn-sm" data-bind="click: choseModel">@carModel.Name</div>
                     </li>
                 }
             </ul>

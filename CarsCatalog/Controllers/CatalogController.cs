@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
@@ -18,7 +17,6 @@ namespace CarsCatalog.Controllers
 
         private int _elementsPerPage;
         private int _columns;
-        private int _rows;
 
         public CatalogController()
             : this(null, null, null, null)
@@ -34,21 +32,15 @@ namespace CarsCatalog.Controllers
             _changePriceRepository = changePriceRepository;
 
             _columns = 4;
-            _rows = 5;
-            _elementsPerPage = _columns * _rows;
+            _elementsPerPage = 12;
         }
 
         public ActionResult Index()
         {
             CheckCookies();
-            List<int> elementsOnPageList = new List<int>(5);
-            for (int i = 3; i < 10; i++)
-            {
-                elementsOnPageList.Add(i * _columns);
-            }
             ViewBag.Columns = _columns;
-            ViewBag.elementsPerPageList = new SelectList(elementsOnPageList, _elementsPerPage);
-            ViewBag.columnsList = new SelectList(Enumerable.Range(2, 4), _columns);
+            ViewBag.elementsPerPageList = new SelectList(new[] {12, 24, 36, 48}, _elementsPerPage);
+            ViewBag.columnsList = new SelectList(new[] {2, 3, 4}, _columns);
             return View();
         }
 
@@ -105,7 +97,7 @@ namespace CarsCatalog.Controllers
 
         public ActionResult GetDistinctColors(FilterParams filter)
         {
-            if (filter.Color == null || filter.Color.Length > 20)
+            if (filter.Color.Length > 20)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
             var cars = _carRepository.GetCarsFromFilter(filter);
@@ -123,15 +115,14 @@ namespace CarsCatalog.Controllers
             return Json(distinctEngines, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult SetElementsCountOnPage(int rows = 5, int columns = 4)
+        public ActionResult SetElementsCountOnPage(int elementsPerPage = 12, int columns = 4)
         {
-            if (columns < 2 || columns > 7 || rows < 1 || rows > 20)
+            if (columns < 2 || columns > 7 || elementsPerPage < 5 || elementsPerPage > 100)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             _columns = columns;
-            _rows = rows;
-            _elementsPerPage = _columns * _rows;
+            _elementsPerPage = elementsPerPage;
             Response.Cookies.Set(new HttpCookie("columns", _columns.ToString()));
-            Response.Cookies.Set(new HttpCookie("rows", _rows.ToString()));
+            Response.Cookies.Set(new HttpCookie("elementsPerPage", _elementsPerPage.ToString()));
             return Json("ok", JsonRequestBehavior.AllowGet);
         }
 
@@ -160,17 +151,15 @@ namespace CarsCatalog.Controllers
             ViewBag.Columns = _columns;
 
 
-            if (Request.Cookies["rows"] != null)
+            if (Request.Cookies["elementsPerPage"] != null)
             {
-                if (int.TryParse(Request.Cookies["rows"].Value, out _rows))
+                if (int.TryParse(Request.Cookies["elementsPerPage"].Value, out _elementsPerPage))
                 {
-                    if (_rows < 2 || _rows > 20)
-                        _rows = 5;
+                    if (_elementsPerPage < 5 || _elementsPerPage > 100)
+                        _elementsPerPage = 12;
                 }
             }
-            Response.Cookies.Set(new HttpCookie("rows", _rows.ToString()));
-
-            _elementsPerPage = _columns * _rows;
+            Response.Cookies.Set(new HttpCookie("elementsPerPage", _elementsPerPage.ToString()));
             ViewBag.ElementsOnPage = _elementsPerPage;
         }
     }
