@@ -13,11 +13,11 @@
 
                     <div class="catalog-col-count">
                         <span>Columns</span>
-                        @Html.DropDownList("columnsList", null, new { id = "columns-list" })
+                        @Html.DropDownList("columnsList", null, new { id = "columns-list", data_bind = "value: columnsCount" })
                     </div>
                     <div class="catalog-elements-on-page">
                         <span> Elements on page</span>
-                        @Html.DropDownList("elementsPerPageList", null, new { id = "elements-per-page-list" })
+                        @Html.DropDownList("elementsPerPageList", null, new { id = "elements-per-page-list", data_bind = "value: elementsOnPage"})
                     </div>
 
                 </div>
